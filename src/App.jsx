@@ -1,4 +1,5 @@
 import './App.css'
+import { useEffect, useRef } from 'react'
 
 const skills = [
   {
@@ -43,11 +44,45 @@ const projects = [
   },
 ]
 
+function useScrollReveal() {
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('revealed')
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.15 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  return ref
+}
+
+function RevealSection({ children, className = '', delay = 0 }) {
+  const ref = useScrollReveal()
+  return (
+    <div
+      ref={ref}
+      className={`scroll-reveal ${className}`}
+      style={{ '--reveal-delay': `${delay}s` }}
+    >
+      {children}
+    </div>
+  )
+}
+
 function App() {
   return (
     <div className="page">
       <div className="glow glow-one" />
       <div className="glow glow-two" />
+      <div className="glow glow-three" />
 
       <header className="nav">
         <div className="logo-mark">
@@ -81,17 +116,8 @@ function App() {
               View projects
             </a>
           </div>
-          <div className="hero-stats fade-up" style={{ '--delay': '0.4s' }}>
-            <div>
-              <strong>40+</strong>
-              <span>Projects shipped</span>
-            </div>
-            <div>
-              <strong>15</strong>
-              <span>Industries served</span>
-            </div>
-          </div>
         </div>
+
         <div className="hero-card fade-up" style={{ '--delay': '0.25s' }}>
           <div className="status">
             <span className="dot" />
@@ -103,8 +129,12 @@ function App() {
             simple, beautiful experiences.
           </p>
           <div className="chip-row">
-            {languages.map((language) => (
-              <span className="chip" key={language}>
+            {languages.map((language, i) => (
+              <span
+                className="chip fade-up"
+                key={language}
+                style={{ '--delay': `${0.35 + i * 0.07}s` }}
+              >
                 {language}
               </span>
             ))}
@@ -113,77 +143,81 @@ function App() {
       </section>
 
       <section className="section" id="projects">
-        <div className="section-header">
+        <RevealSection className="section-header">
           <h2>Featured projects</h2>
           <p>Case studies that highlight product design, performance, and scale.</p>
-        </div>
+        </RevealSection>
         <div className="grid projects-grid">
-          {projects.map((project) => (
-            <article className="card" key={project.name}>
-              <div className="card-top">
-                <h3>{project.name}</h3>
-                <span className="badge">Live</span>
-              </div>
-              <p>{project.desc}</p>
-              <div className="tags">
-                {project.tags.map((tag) => (
-                  <span key={tag}>{tag}</span>
-                ))}
-              </div>
-              <a className="link-button" href={project.url} target="_blank" rel="noreferrer">
-                View project →
-              </a>
-            </article>
+          {projects.map((project, i) => (
+            <RevealSection delay={i * 0.12} key={project.name}>
+              <article className="card">
+                <div className="card-top">
+                  <h3>{project.name}</h3>
+                  <span className="badge">Live</span>
+                </div>
+                <p>{project.desc}</p>
+                <div className="tags">
+                  {project.tags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </div>
+                <a className="link-button" href={project.url} target="_blank" rel="noreferrer">
+                  View project →
+                </a>
+              </article>
+            </RevealSection>
           ))}
         </div>
       </section>
 
       <section className="section alt" id="skills">
-        <div className="section-header">
+        <RevealSection className="section-header">
           <h2>Technology stack</h2>
           <p>Tools, platforms, and languages I use to build production-ready apps.</p>
-        </div>
+        </RevealSection>
         <div className="grid skill-grid">
-          {skills.map((skill) => (
-            <div className="card soft" key={skill.title}>
-              <h3>{skill.title}</h3>
-              <div className="pill-grid">
-                {skill.items.map((item, index) => (
-                  <span className="pill fade-up" key={item} style={{ '--delay': `${0.05 * index}s` }}>
-                    {item}
-                  </span>
-                ))}
+          {skills.map((skill, si) => (
+            <RevealSection delay={si * 0.1} key={skill.title}>
+              <div className="card soft">
+                <h3>{skill.title}</h3>
+                <div className="pill-grid">
+                  {skill.items.map((item, index) => (
+                    <span className="pill" key={item} style={{ '--pill-delay': `${0.05 * index}s` }}>
+                      {item}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            </RevealSection>
           ))}
         </div>
       </section>
 
       <section className="section cta" id="contact">
-        <div className="cta-content">
+        <RevealSection className="cta-content">
           <h2>Let&apos;s build your next product</h2>
           <p>
             Ready to launch, redesign, or scale? I can help with strategy, execution,
             and long-term growth.
           </p>
-        </div>
-        <div className="cta-actions">
+        </RevealSection>
+        <RevealSection delay={0.15} className="cta-actions">
           <a className="button primary" href="mailto:mayamlelemba919@gmail.com">
             mayamlelemba919@gmail.com
           </a>
           <div className="contact-meta">
             <span>Based in Remote / GMT+0</span>
-            <span>Open to full-time & contract</span>
+            <span>Open to full-time &amp; contract</span>
           </div>
-        </div>
+        </RevealSection>
       </section>
 
       <footer className="footer">
-        <span>© 2026 Maya </span>
+        <span>© 2026 Maya</span>
         <div className="footer-links">
-          <a href="#">LinkedIn</a>
-          <a href="#">GitHub</a>
-          <a href="#">Dribbble</a>
+        
+          <a href="https://github.com/Access13">GitHub</a>
+          
         </div>
       </footer>
     </div>
